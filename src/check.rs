@@ -39,6 +39,7 @@ pub enum Status {
     Failure,
 }
 
+#[tracing::instrument]
 pub fn check_toolchain<'a>(
     version: &'a semver::Version,
     config: &'a Config,
@@ -68,6 +69,7 @@ pub fn as_toolchain_specifier(version: &semver::Version, target: &str) -> String
     format!("{}-{}", version, target)
 }
 
+#[tracing::instrument]
 fn examine_toolchain(
     version: &semver::Version,
     config: &Config,
@@ -90,6 +92,7 @@ fn examine_toolchain(
     )
 }
 
+#[tracing::instrument]
 fn download_if_required(
     version: &semver::Version,
     toolchain_specifier: &str,
@@ -97,6 +100,8 @@ fn download_if_required(
 ) -> TResult<()> {
     let toolchain = toolchain_specifier.to_owned();
     output.progress(ProgressAction::Installing, version);
+
+    tracing::info!("Installing toolchain {}", toolchain);
 
     let status = command(&["install", "--profile", "minimal", &toolchain], None)
         .and_then(|mut c| c.wait().map_err(CargoMSRVError::Io))?;

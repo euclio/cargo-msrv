@@ -28,6 +28,7 @@ pub enum CargoMSRVError {
     SystemTime(std::time::SystemTimeError),
     ToolchainNotInstalled,
     UnknownTarget,
+    UnableToAccessLogFolder,
     UnableToCacheChannelManifest,
     UnableToFindAnyGoodVersion { command: String },
     UnableToParseCliArgs,
@@ -55,6 +56,7 @@ impl fmt::Display for CargoMSRVError {
             CargoMSRVError::SystemTime(err) => err.fmt(f),
             CargoMSRVError::ToolchainNotInstalled => write!(f, "The given toolchain could not be found. Run `rustup toolchain list` for an overview of installed toolchains."),
             CargoMSRVError::UnknownTarget => write!(f, "The given target could not be found. Run `rustup target list` for an overview of available toolchains."),
+            CargoMSRVError::UnableToAccessLogFolder => write!(f, "Unable to access log folder, run with --no-log to try again without logging"),
             CargoMSRVError::UnableToCacheChannelManifest => write!(f, "Unable to get or store the channel manifest on disk."),
             CargoMSRVError::UnableToFindAnyGoodVersion { command } => write!(f, r#"Unable to find a Minimum Supported Rust Version (MSRV).
 

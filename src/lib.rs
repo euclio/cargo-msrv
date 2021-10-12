@@ -21,6 +21,7 @@ pub mod fetch;
 pub mod lockfile;
 pub mod reporter;
 
+#[tracing::instrument]
 pub fn run_app(config: &Config, reporter: &Reporter) -> TResult<()> {
     let index = match config.release_source() {
         ReleaseSource::RustChangelog => {
@@ -55,6 +56,7 @@ fn run_determine_msrv_action(
     }
 }
 
+#[tracing::instrument]
 fn run_verify_msrv_action(
     config: &Config,
     reporter: &Reporter,
