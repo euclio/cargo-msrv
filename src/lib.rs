@@ -20,6 +20,7 @@ pub mod errors;
 pub mod fetch;
 pub mod lockfile;
 pub mod reporter;
+pub mod toolchain;
 
 pub fn run_app(config: &Config) -> TResult<()> {
     let index_strategy = RustChangelog::fetch_channel(Channel::Stable)?;
