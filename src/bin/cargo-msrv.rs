@@ -22,6 +22,7 @@ fn init_and_run() -> TResult<()> {
         .ok_or_else(|| CargoMSRVError::UnableToAccessLogFolder)?;
 
     if !config.no_tracing() {
+        std::env::set_var("RUST_LOG", "INFO");
         init_tracing(log_folder.data_local_dir());
     }
 
@@ -39,16 +40,15 @@ fn init_and_run() -> TResult<()> {
 
     tracing::info!("Finished app");
 
+    std::env::remove_var("RUST_LOG");
+
     Ok(())
 }
 
 fn init_tracing(log_folder: &Path) {
     let file_appender = RollingFileAppender::new(Rotation::NEVER, log_folder, "cargo-msrv.log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
-    tracing_subscriber::fmt()
-        .with_writer(non_blocking)
-        .try_init()
-        .unwrap();
+    tracing_subscriber::fmt().with_writer(non_blocking).init();
 
     tracing::info!("Initialized tracing subscriber");
 }
