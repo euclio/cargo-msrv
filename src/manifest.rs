@@ -1,7 +1,8 @@
-use decent_toml_rs_alternative::TomlValue;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
+
+use decent_toml_rs_alternative::TomlValue;
 
 pub type TomlMap = HashMap<String, TomlValue>;
 
@@ -216,8 +217,9 @@ fn find_minimum_rust_version(map: &TomlMap) -> Option<String> {
 
 #[cfg(test)]
 mod minimal_version_tests {
-    use crate::manifest::{BareVersion, CargoManifest, CargoManifestParser, TomlMap, TomlParser};
     use std::convert::TryFrom;
+
+    use crate::manifest::{BareVersion, CargoManifest, CargoManifestParser, TomlMap, TomlParser};
 
     #[test]
     fn parse_toml() {
@@ -448,10 +450,12 @@ msrv = "{}"
 
 #[cfg(test)]
 mod bare_version_tests {
-    use crate::manifest::BareVersion;
-    use rust_releases::{semver, Release, ReleaseIndex};
     use std::iter::FromIterator;
+
+    use rust_releases::{semver, Release, ReleaseIndex};
     use yare::parameterized;
+
+    use crate::manifest::BareVersion;
 
     fn release_indices() -> ReleaseIndex {
         FromIterator::from_iter(vec![

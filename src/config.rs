@@ -1,8 +1,10 @@
-use crate::errors::{CargoMSRVError, TResult};
-use clap::ArgMatches;
-use rust_releases::semver;
 use std::convert::TryFrom;
 use std::path::{Path, PathBuf};
+
+use clap::ArgMatches;
+use rust_releases::semver;
+
+use crate::errors::{CargoMSRVError, TResult};
 
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
@@ -35,6 +37,8 @@ pub fn test_config_from_matches<'a>(matches: &'a ArgMatches<'a>) -> TResult<Conf
 pub enum ModeIntent {
     // Determines the MSRV for a project
     DetermineMSRV,
+    // List the MSRV's as specified by package authors
+    List,
     // Verifies the given MSRV
     VerifyMSRV,
 }
@@ -43,6 +47,7 @@ impl From<ModeIntent> for &'static str {
     fn from(action: ModeIntent) -> Self {
         match action {
             ModeIntent::DetermineMSRV => "determine-msrv",
+            ModeIntent::List => "list",
             ModeIntent::VerifyMSRV => "verify-msrv",
         }
     }
@@ -259,10 +264,10 @@ impl<'config> TryFrom<&'config ArgMatches<'config>> for Config<'config> {
         use crate::cli::id;
         use crate::fetch::default_target;
 
-        let action_intent = if matches.is_present(id::ARG_VERIFY) {
-            ModeIntent::VerifyMSRV
-        } else {
-            ModeIntent::DetermineMSRV
+        let action_intent = match matches.subcommand_matches(id::SUB_COMMAND_LIST) {
+            Some(_list) => ModeIntent::List,
+            None if matches.is_present(id::ARG_VERIFY) => ModeIntent::VerifyMSRV,
+            None => ModeIntent::DetermineMSRV,
         };
 
         // FIXME: if set, we don't need to do this; in case we can't find it, it may fail here, but atm can't be manually supplied at all
