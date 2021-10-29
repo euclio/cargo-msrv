@@ -1,7 +1,7 @@
 use std::env;
 use std::error::Error;
 use std::fmt;
-use std::fmt::Formatter;
+use std::fmt::{Debug, Formatter};
 use std::io;
 use std::path::PathBuf;
 use std::string::FromUtf8Error;
@@ -12,6 +12,7 @@ pub type TResult<T> = Result<T, CargoMSRVError>;
 
 #[derive(Debug)]
 pub enum CargoMSRVError {
+    CargoMetadata(cargo_metadata::Error),
     DefaultHostTripleNotFound,
     Env(env::VarError),
     GenericMessage(String),
@@ -44,6 +45,7 @@ pub enum CargoMSRVError {
 impl fmt::Display for CargoMSRVError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
+            CargoMSRVError::CargoMetadata(err) => err.fmt(f),
             CargoMSRVError::DefaultHostTripleNotFound => write!(f, "The default host triple (target) could not be found."),
             CargoMSRVError::Env(err) => err.fmt(f),
             CargoMSRVError::GenericMessage(msg) => write!(f, "{}", msg.as_str()),
@@ -87,6 +89,12 @@ impl Error for CargoMSRVError {}
 impl From<String> for CargoMSRVError {
     fn from(msg: String) -> Self {
         CargoMSRVError::GenericMessage(msg)
+    }
+}
+
+impl From<cargo_metadata::Error> for CargoMSRVError {
+    fn from(err: cargo_metadata::Error) -> Self {
+        CargoMSRVError::CargoMetadata(err)
     }
 }
 
